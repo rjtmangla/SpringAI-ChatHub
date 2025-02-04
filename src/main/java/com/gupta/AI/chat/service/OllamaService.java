@@ -8,12 +8,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.document.Document;
+import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
+import org.springframework.ai.transformer.splitter.TextSplitter;
+import org.springframework.ai.transformer.splitter.TokenTextSplitter;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -28,9 +34,13 @@ public class OllamaService {
     private ChatClient chatClient;
     private ChatMemory chatMemory;
 
-    public OllamaService(ChatClient.Builder builder) {
+    private VectorStore vectorStore;
+
+    public OllamaService(ChatClient.Builder builder, VectorStore vectorStore) {
         this.chatMemory = new InMemoryChatMemory();
-        this.chatClient = builder.defaultAdvisors(new MessageChatMemoryAdvisor(chatMemory)).build();
+        this.vectorStore = vectorStore;
+        this.chatClient = builder.defaultAdvisors(new MessageChatMemoryAdvisor(chatMemory),
+                new QuestionAnswerAdvisor(vectorStore)).build();
     }
 
     public ChatResponse getAnswer(String conversationId, String message) {
@@ -73,16 +83,16 @@ public class OllamaService {
     private List<ChatHistoryResponse.ChatHistory> createHistoryObject(List<Message> messages) {
         List<ChatHistoryResponse.ChatHistory> history = new ArrayList<>();
         for (Message message : messages) {
-            if (message.getMessageType() == MessageType.ASSISTANT) {
-                AssistantMessage assistantMessage = (AssistantMessage) message;
-                history.add(new
-                        ChatHistoryResponse.ChatHistory(MessageType.ASSISTANT.getValue(), assistantMessage.getText(),
-                        new Date()));
-            } else if (message.getMessageType() == MessageType.USER) {
-                UserMessage userMessage = (UserMessage) message;
-                history.add(new ChatHistoryResponse.ChatHistory(MessageType.USER.getValue(), userMessage.getText(), new Date()));
-
-            }
+//            if (message.getMessageType() == MessageType.ASSISTANT) {
+//                AssistantMessage assistantMessage = (AssistantMessage) message;
+//                history.add(new
+//                        ChatHistoryResponse.ChatHistory(MessageType.ASSISTANT.getValue(), assistantMessage.getText(),
+//                        new Date()));
+//            } else if (message.getMessageType() == MessageType.USER) {
+//                UserMessage userMessage = (UserMessage) message;
+//                history.add(new ChatHistoryResponse.ChatHistory(MessageType.USER.getValue(), userMessage.getText(), new Date()));
+//
+//            }
         }
         return history;
     }
@@ -101,5 +111,15 @@ public class OllamaService {
         validateConversationId(conversationId, "removeChatHistory");
         LOGGER.info("Removed history for conversation. conversationId={}", conversationId);
         chatMemory.clear(conversationId);
+    }
+
+    public void addTextToStore(String text) {
+        TextSplitter splitter = new TokenTextSplitter();
+        Document document = new Document(text);
+        vectorStore.add(splitter.split(document));
+    }
+
+    public List<Document> similaritySearch(String text) {
+        return vectorStore.similaritySearch(text);
     }
 }
