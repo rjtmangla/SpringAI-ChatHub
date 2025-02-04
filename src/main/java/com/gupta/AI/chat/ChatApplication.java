@@ -1,5 +1,7 @@
 package com.gupta.AI.chat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -14,6 +16,8 @@ import java.util.List;
 @SpringBootApplication
 public class ChatApplication {
 
+    private static final Logger LOGGER= LoggerFactory.getLogger(ChatApplication.class);
+
     public static void main(String[] args) {
         SpringApplication.run(ChatApplication.class, args);
     }
@@ -26,6 +30,7 @@ public class ChatApplication {
             PagePdfDocumentReader reader = new PagePdfDocumentReader("classpath:/3.pdf");
             List<Document> documents = reader.get();
             vectorStore.add(documents);
+            LOGGER.info("Document added to vector DB.");
         };
     }
 }
