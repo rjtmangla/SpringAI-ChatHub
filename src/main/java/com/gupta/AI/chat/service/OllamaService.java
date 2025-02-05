@@ -3,6 +3,7 @@ package com.gupta.AI.chat.service;
 import com.gupta.AI.chat.beans.ChatHistoryResponse;
 import com.gupta.AI.chat.beans.ChatResponse;
 import com.gupta.AI.chat.exceptions.InvalidConversionException;
+import com.gupta.AI.chat.memory.PersistedChatMemory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
@@ -31,12 +32,11 @@ public class OllamaService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OllamaService.class);
     private ChatClient chatClient;
-    private ChatMemory chatMemory;
-
+    private PersistedChatMemory chatMemory;
     private VectorStore vectorStore;
 
     public OllamaService(ChatClient.Builder builder, VectorStore vectorStore) {
-        this.chatMemory = new InMemoryChatMemory();
+        this.chatMemory = new PersistedChatMemory();
         this.vectorStore = vectorStore;
         this.chatClient = builder.defaultAdvisors(new MessageChatMemoryAdvisor(chatMemory),
                 new QuestionAnswerAdvisor(vectorStore)).build();
@@ -55,7 +55,7 @@ public class OllamaService {
                         AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, id)).
                 user(message).call().content();
         ChatResponse chatResponse = new ChatResponse(conversationId, response);
-        LOGGER.debug("Got the answer for conversation. conversationId={}, timeTakenToComplete={}", conversationId, (System.currentTimeMillis() - startTime));
+        LOGGER.info("Got the answer for conversation. conversationId={}, timeTakenToComplete={}", conversationId, (System.currentTimeMillis() - startTime));
         LOGGER.debug("Got the answer for the question. conversationId={}, message={},response={}", conversationId, message, chatResponse);
         return chatResponse;
     }
@@ -65,7 +65,7 @@ public class OllamaService {
             LOGGER.info("Found invalid conversation format in {}. conversionId={}", operation, conversationId);
             throw new InvalidConversionException("Empty conversationId");
         }
-        if (chatMemory.get(conversationId, 1).isEmpty()) {
+        if (!chatMemory.isValidConversationId(conversationId)) {
             LOGGER.info("Found invalid conversation in {}. conversionId={}", operation, conversationId);
             throw new InvalidConversionException("Invalid conversationId");
         }
@@ -119,5 +119,10 @@ public class OllamaService {
 
     public List<Document> similaritySearch(String text) {
         return vectorStore.similaritySearch(text);
+    }
+
+    public List<String> getAllConversationIds() {
+        LOGGER.info("Got request to fetch all conversationIds");
+        return chatMemory.getConversationIds();
     }
 }

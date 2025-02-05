@@ -3,14 +3,16 @@ package com.gupta.AI.chat.contoller;
 import com.gupta.AI.chat.beans.ChatHistoryResponse;
 import com.gupta.AI.chat.beans.ChatRequest;
 import com.gupta.AI.chat.beans.ChatResponse;
+import com.gupta.AI.chat.beans.ConversationListResponse;
 import com.gupta.AI.chat.service.OllamaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/chat")
+@RequestMapping(value = "/api/chat", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ChatRestController {
 
     @Autowired
@@ -32,6 +34,12 @@ public class ChatRestController {
     @DeleteMapping
     public void removeConversation(@RequestParam("conversationId") String conversationId) {
         ollamaService.removeChatHistory(conversationId);
+    }
+
+    @GetMapping("/allconverstions")
+    public ConversationListResponse getAllConversation() {
+        List<String> conversationIds = ollamaService.getAllConversationIds();
+        return new ConversationListResponse(conversationIds);
     }
 
 }
