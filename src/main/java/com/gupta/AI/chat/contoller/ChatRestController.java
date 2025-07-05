@@ -43,3 +43,29 @@ public class ChatRestController {
     }
 
 }
+////
+////https://ai.gopubby.com/microsofts-graphrag-autogen-ollama-chainlit-fully-local-free-multi-agent-rag-superbot-61ad3759f06f
+////
+////        https://tpbabparn.medium.com/in-house-llm-application-by-spring-ai-ollama-91c48e2d2d38
+////
+////        https://levelup.gitconnected.com/add-generative-ai-in-your-spring-boot-application-spring-ai-12561b1adf08
+////        https://yogeshbali.medium.com/exploring-spring-ai-in-the-spring-boot-3-0-x-6c12ee5e7930
+////        https://medium.com/@huzmedianyc/building-ai-powered-applications-with-deepseek-and-spring-ai-3b2996d1de3d
+////
+////        https://medium.com/software-newspaper/building-a-document-query-system-with-spring-ai-pgvector-and-ollama-dfafccad26c2
+////        https://wire.insiderfinance.io/real-time-ai-stock-advisor-with-ollama-streamlit-c8ce727c236f
+////
+////        https://ai.gopubby.com/run-llama-3-on-your-laptop-an-introduction-to-ollama-for-beginners-06ba8a110d12
+////        https://foojay.io/today/spring-ai-how-to-write-genai-applications-with-java/?ref=dailydev
+////
+//
+//
+//https://github.com/mckaywrigley/chatbot-ui
+//        https://github.com/ivanfioravanti/chatbot-ollama
+//        https://github.com/rjtmangla/E-shop/blob/master/src/main/resources/templates/admin.html
+//        https://github.com/rjtmangla/springboot-notes-app
+//
+//        https://github.com/rjtmangla/StickyNotes
+//        https://github.com/rjtmangla/Ecommerce-Website-Spring-Boot
+//        https://github.com/rjtmangla/Books_notes
+//        https://github.com/rjtmangla/interview-notes1

@@ -12,6 +12,7 @@
     <artifactId>chat</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>SpringAI-ChatHub</name>
+    <packaging>jar</packaging>
     <description>Create a project for chat using Spring AI</description>
     <url/>
     <licenses>
